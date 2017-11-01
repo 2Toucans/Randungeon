@@ -1,4 +1,5 @@
 ﻿Shader "Custom/MainShader" {
+	// Properties copy pasted from standard shader
 	Properties
 	{
 		_Color("Color", Color) = (1,1,1,1)
@@ -51,6 +52,47 @@
 		UsePass "Standard/META"
 		
 		Pass {
+			Name "FOG_PASS"
+			Cull Off
+			ZWrite Off
+			Blend SrcAlpha OneMinusSrcAlpha
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
+			#pragma debug
+
+			#include "UnityCG.cginc"
+
+			#define FOG_COLOR fixed4(0.75, 0.75, 0.85, 1)
+			#define FOG_DISTANCE 0.2
+
+			uniform int _FogEnabled;
+
+			struct vInput {
+				float4 vertex : POSITION;
+			};
+
+			struct fInput {
+				float4 position : SV_POSITION;
+			};
+
+			fInput vert(vInput i) {
+				fInput o;
+				o.position = UnityObjectToClipPos(i.vertex);
+
+				return o;
+			}
+
+			fixed4 frag(fInput i) : SV_TARGET{
+				fixed fogStrength = (1 - i.position.z * FOG_DISTANCE / _ProjectionParams.w);
+				fixed4 fogLight = FOG_COLOR * fogStrength * (_FogEnabled ? 0 : 1);
+				return fogLight;
+			}
+
+			ENDCG
+		}
+		Pass {
+			Name "AMBIENT_PASS"
 			Cull Off
 			ZWrite Off
 			Blend SrcAlpha One
@@ -64,7 +106,6 @@
 			#define AMBIENT_LIGHT_COLOR fixed4(0.884, 0.72, 1, 0.25)
 
 			uniform int _Night;
-			uniform int _FogEnabled;
 
 			struct vInput {
 				float4 vertex : POSITION;
