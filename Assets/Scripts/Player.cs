@@ -7,6 +7,7 @@ public class Player : MonoBehaviour {
     public float movementAccel = 10f;
     public float turnAccel = 360f;
     public float maxTurnSpeed = 180f;
+    public float jumpImpulse = 4f;
 
     private float turnSpeed = 0;
 
@@ -19,16 +20,19 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		if (Input.GetKey(KeyCode.UpArrow)) {
+        if (Input.GetButtonDown("Jump")) {
+            Jump();
+        }
+		if (Input.GetAxis("Vertical") > 0.4f) {
             MoveForward();
         }
-        else if (Input.GetKey(KeyCode.DownArrow)) {
+        else if (Input.GetAxis("Vertical") < -0.4f) {
             MoveBackward();
         }
-        if (Input.GetKey(KeyCode.LeftArrow)) {
+        if (Input.GetAxis("Horizontal") < -0.4f) {
             TurnLeft();
         }
-        else if (Input.GetKey(KeyCode.RightArrow)) {
+        else if (Input.GetAxis("Horizontal") > 0.4f) {
             TurnRight();
         }
         else {
@@ -48,6 +52,12 @@ public class Player : MonoBehaviour {
 
         CapSpeed();
         transform.Rotate(new Vector3(0, turnSpeed * Time.fixedDeltaTime, 0));
+    }
+
+    private void Jump() {
+        if (Physics.Raycast(transform.position, -transform.up, 1.25f)) {
+            body.velocity += transform.up * jumpImpulse;
+        }
     }
 
     private void MoveForward() {
