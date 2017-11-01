@@ -63,7 +63,7 @@ public class Maze : MonoBehaviour
             || !sectionCleared[column - 1, row - 1]) && !(column == sizeX + 1 && row == exitIndex))
         {
             tiles[column, row] = Instantiate(wallPrefab);
-            tiles[column, row].transform.Translate(column * 2, row * 2, 0);
+            tiles[column, row].transform.Translate(column * 2, 0, row * 2);
         }
     }
 
