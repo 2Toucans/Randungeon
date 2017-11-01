@@ -126,4 +126,9 @@ public class Maze : MonoBehaviour
             choices[max] = temp;
         }
     }
+
+    public bool[,] getMaze()
+    {
+        return sectionCleared;
+    }
 }

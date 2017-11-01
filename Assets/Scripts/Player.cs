@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Player : MonoBehaviour {
-    public float maxSpeed = 5;
-    public float movementAccel = 10f;
-    public float turnAccel = 360f;
-    public float maxTurnSpeed = 180f;
-    public float jumpImpulse = 4f;
+    public float maxSpeed;
+    public float movementAccel;
+    public float turnAccel;
+    public float maxTurnSpeed;
+    public float jumpImpulse;
 
     public Camera camera;
 
@@ -24,6 +24,9 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+        if (Input.GetButtonDown("Reset")) {
+            Reset();
+        }
         if (Input.GetButtonDown("Jump") && !noclip) {
             Jump();
         }
@@ -161,5 +164,13 @@ public class Player : MonoBehaviour {
     private void AdjustCamera() {
         camera.transform.localEulerAngles += new Vector3(vTurnSpeed * Time.fixedDeltaTime, 0, 0);
         Vector3 angles = camera.transform.localEulerAngles;
+    }
+
+    private void Reset() {
+        body.velocity = new Vector3(0, 0, 0);
+        camera.transform.localEulerAngles = new Vector3(0, 0, 0);
+        transform.rotation = Quaternion.identity;
+        transform.position = new Vector3(2, 0, 2);
+        noclip = false;
     }
 }
