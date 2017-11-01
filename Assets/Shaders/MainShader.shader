@@ -85,7 +85,7 @@
 
 			fixed4 frag(fInput i) : SV_TARGET{
 				fixed fogStrength = (1 - i.position.z * FOG_DISTANCE / _ProjectionParams.w);
-				fixed4 fogLight = FOG_COLOR * fogStrength * (_FogEnabled ? 0 : 1);
+				fixed4 fogLight = FOG_COLOR * fogStrength * (_FogEnabled ? 1 : 0);
 				return fogLight;
 			}
 
