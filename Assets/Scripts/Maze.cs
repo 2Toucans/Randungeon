@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Maze : MonoBehaviour
 {
-    public int sizeX, sizeY;
+    public int sizeX, sizeZ;
 	public GameObject wallPrefab;
+	public GameObject groundPrefab;
     public const int SIDES = 4;
 
     private bool[,] sectionCleared;
@@ -15,13 +16,13 @@ public class Maze : MonoBehaviour
 	// Use this for initialization
 	void Start()
     {
-        sectionCleared = new bool[sizeX, sizeY];
+        sectionCleared = new bool[sizeX, sizeZ];
         exitIndex = 1;
 
-        tiles = new GameObject[sizeX + 2, sizeY + 2];
+        tiles = new GameObject[sizeX + 2, sizeZ + 2];
         
 		for(int i = 0; i < sizeX; i++){
-            for(int j = 0; j < sizeY; j++){
+            for(int j = 0; j < sizeZ; j++){
                 sectionCleared[i,j] = false;
             }
         }
@@ -29,7 +30,7 @@ public class Maze : MonoBehaviour
         clearPath(0,0);
         
         List<int> lastCol = new List<int>();
-        for(int i = 0; i < sizeY-1; i++)
+        for(int i = 0; i < sizeZ-1; i++)
         {
             if(sectionCleared[sizeX-1,i])
                 lastCol.Add(i);
@@ -37,18 +38,21 @@ public class Maze : MonoBehaviour
         
         exitIndex = lastCol[Random.Range(0, lastCol.Count-1)] + 1;
 
-        for(int i = 0; i < sizeY+2; i++)
+        for(int i = 0; i < sizeZ+2; i++)
             createTile(0, i);
         for (int i = 0; i < sizeX; i++){
             createTile(i+1, 0);
-            for (int j = 0; j < sizeY; j++){
+            for (int j = 0; j < sizeZ; j++){
                 createTile(i+1,j+1);
             }
-            createTile(i+1, sizeY+1);
+            createTile(i+1, sizeZ+1);
         }
-        for (int i = 0; i < sizeY+2; i++)
-            createTile(sizeY + 1, i);
-
+        for (int i = 0; i < sizeZ+2; i++)
+            createTile(sizeZ + 1, i);
+		
+		GameObject ground = Instantiate(groundPrefab);
+        ground.transform.Translate(sizeX+1, sizeZ+1, 1);
+        ground.transform.localScale += new Vector3(sizeX * 2, sizeZ * 2, 0);
     }
 	
 	// Update is called once per frame
@@ -59,7 +63,7 @@ public class Maze : MonoBehaviour
 
     private void createTile(int row, int column)
     {
-        if (((row == 0 || column == 0 || row == sizeY + 1 || column == sizeX + 1)
+        if (((row == 0 || column == 0 || row == sizeZ + 1 || column == sizeX + 1)
             || !sectionCleared[column - 1, row - 1]) && !(column == sizeX + 1 && row == exitIndex))
         {
             tiles[column, row] = Instantiate(wallPrefab);
@@ -77,7 +81,7 @@ public class Maze : MonoBehaviour
             adj++;
         if(row >= 1 && sectionCleared[column,row-1])
             adj++;
-        if(row < sizeY-1 && sectionCleared[column,row+1])
+        if(row < sizeZ-1 && sectionCleared[column,row+1])
             adj++;
         
         return adj;
@@ -93,7 +97,7 @@ public class Maze : MonoBehaviour
     private void clearPath(int column, int row) {
         int randDir, temp;
         int max = SIDES;
-        if(column < 0 || column >= sizeX || row < 0 || row >= sizeY ||
+        if(column < 0 || column >= sizeX || row < 0 || row >= sizeZ ||
                 getAdj(column, row) > 1 || sectionCleared[column,row])
             return;
             
