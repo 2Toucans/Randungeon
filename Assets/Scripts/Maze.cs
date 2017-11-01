@@ -5,18 +5,20 @@ using UnityEngine;
 public class Maze : MonoBehaviour
 {
     public int sizeX, sizeY;
-	public MazeTile tilePrefab;
-    public MazeTile wallPrefab;
+	public GameObject wallPrefab;
     public const int SIDES = 4;
 
     private bool[,] sectionCleared;
-	private MazeTile[,] tiles;
+	private GameObject[,] tiles;
+    private int exitIndex;
 
 	// Use this for initialization
 	void Start()
     {
         sectionCleared = new bool[sizeX, sizeY];
-        tiles = new MazeTile[sizeX + 2, sizeY + 2];
+        exitIndex = 1;
+
+        tiles = new GameObject[sizeX + 2, sizeY + 2];
         
 		for(int i = 0; i < sizeX; i++){
             for(int j = 0; j < sizeY; j++){
@@ -25,6 +27,15 @@ public class Maze : MonoBehaviour
         }
         //Start digging the maze starting from the top left
         clearPath(0,0);
+        
+        List<int> lastCol = new List<int>();
+        for(int i = 0; i < sizeY-1; i++)
+        {
+            if(sectionCleared[sizeX-1,i])
+                lastCol.Add(i);
+        }
+        
+        exitIndex = lastCol[Random.Range(0, lastCol.Count-1)] + 1;
 
         for(int i = 0; i < sizeY+2; i++)
             createTile(0, i);
@@ -48,25 +59,25 @@ public class Maze : MonoBehaviour
 
     private void createTile(int row, int column)
     {
-        if(row > 0 && column > 0 && row < sizeX+1 && column < sizeY+1
-            && sectionCleared[row-1, column-1])
-            tiles[row, column] = Instantiate(tilePrefab) as MazeTile;
-        else
-            tiles[row, column] = Instantiate(wallPrefab) as MazeTile;
-        tiles[row, column].transform.Translate(row*2, column*2, 0);
+        if (((row == 0 || column == 0 || row == sizeY + 1 || column == sizeX + 1)
+            || !sectionCleared[column - 1, row - 1]) && !(column == sizeX + 1 && row == exitIndex))
+        {
+            tiles[column, row] = Instantiate(wallPrefab);
+            tiles[column, row].transform.Translate(column * 2, row * 2, 0);
+        }
     }
 
-    private int getAdj(int row, int column)
+    private int getAdj(int column, int row)
     {
         int adj = 0;
         
-        if(row >= 1 && sectionCleared[row-1,column])
+        if(column >= 1 && sectionCleared[column-1,row])
             adj++;
-        if(row < sizeX-1 && sectionCleared[row+1,column])
+        if(column < sizeX-1 && sectionCleared[column+1,row])
             adj++;
-        if(column >= 1 && sectionCleared[row,column-1])
+        if(row >= 1 && sectionCleared[column,row-1])
             adj++;
-        if(column < sizeY-1 && sectionCleared[row,column+1])
+        if(row < sizeY-1 && sectionCleared[column,row+1])
             adj++;
         
         return adj;
@@ -79,16 +90,16 @@ public class Maze : MonoBehaviour
      * @param row The row of the current path
      * @param column The column of the current path
      */
-    private void clearPath(int row, int column) {
-        int randDir,temp;
+    private void clearPath(int column, int row) {
+        int randDir, temp;
         int max = SIDES;
-        if(row < 0 || row >= sizeX || column < 0 || column >= sizeY ||
-                getAdj(row, column) > 1 || sectionCleared[row,column])
+        if(column < 0 || column >= sizeX || row < 0 || row >= sizeY ||
+                getAdj(column, row) > 1 || sectionCleared[column,row])
             return;
             
-        sectionCleared[row,column] = true;
+        sectionCleared[column,row] = true;
         
-        if(column == sizeY-1)
+        if(column == sizeX-1)
             return;
             
         int[] choices = new int[SIDES];
@@ -97,13 +108,13 @@ public class Maze : MonoBehaviour
         for(int j = 0; j < SIDES; j++){
             randDir = Random.Range(0, max--);
             switch(choices[randDir]){
-                case 0: clearPath(row-1,column);
+                case 0: clearPath(column-1,row);
                         break;
-                case 1: clearPath(row,column-1);
+                case 1: clearPath(column,row-1);
                         break;
-                case 2: clearPath(row+1,column);
+                case 2: clearPath(column+1,row);
                         break;
-                case 3: clearPath(row,column+1);
+                case 3: clearPath(column,row+1);
                         break;
             }
             temp = choices[randDir];
