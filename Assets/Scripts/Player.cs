@@ -10,6 +10,7 @@ public class Player : MonoBehaviour {
     public float jumpImpulse = 4f;
 
     private float turnSpeed = 0;
+    private bool noclip = false;
 
     private Rigidbody body;
 
@@ -20,10 +21,16 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-        if (Input.GetButtonDown("Jump")) {
+        if (Input.GetButtonDown("Jump") && !noclip) {
             Jump();
         }
-		if (Input.GetAxis("Vertical") > 0.4f) {
+        else if (Input.GetButton("Jump") && noclip) {
+            MoveUp();
+        }
+        if (Input.GetButton("Crouch") && noclip) {
+            MoveDown();
+        }
+        if (Input.GetAxis("Vertical") > 0.4f) {
             MoveForward();
         }
         else if (Input.GetAxis("Vertical") < -0.4f) {
@@ -48,6 +55,11 @@ public class Player : MonoBehaviour {
                     turnSpeed = 0;
                 }
             }
+        }
+
+        // Miscellaneous Buttons
+        if (Input.GetButtonDown("NoClip")) {
+            ToggleNoclip();
         }
 
         CapSpeed();
@@ -82,11 +94,26 @@ public class Player : MonoBehaviour {
         }
     }
 
+    private void MoveUp() {
+        body.velocity += transform.up * movementAccel * Time.fixedDeltaTime;
+    }
+
+    private void MoveDown() {
+        body.velocity += transform.up * -1 * movementAccel * Time.fixedDeltaTime;
+    }
+
     private void CapSpeed() {
         if (Vector3.Scale(body.velocity, new Vector3(1, 0, 1)).sqrMagnitude > maxSpeed * maxSpeed) {
             Vector3 vel = body.velocity.normalized * maxSpeed;
             body.velocity = Vector3.Scale(body.velocity, Vector3.up)
                 + Vector3.Scale(vel, new Vector3(1, 0, 1));
         }
+    }
+
+    private void ToggleNoclip() {
+        noclip = !noclip;
+        Collider c = GetComponent<Collider>();
+        c.enabled = !noclip;
+        body.useGravity = !noclip;
     }
 }
