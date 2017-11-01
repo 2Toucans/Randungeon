@@ -9,7 +9,10 @@ public class Player : MonoBehaviour {
     public float maxTurnSpeed = 180f;
     public float jumpImpulse = 4f;
 
+    public Camera camera;
+
     private float turnSpeed = 0;
+    private float vTurnSpeed = 0;
     private bool noclip = false;
 
     private Rigidbody body;
@@ -57,13 +60,35 @@ public class Player : MonoBehaviour {
             }
         }
 
+        // Looking around
+        if (Input.GetAxis("Look") > 0) {
+            LookUp();
+        }
+        else if (Input.GetAxis("Look") < 0) {
+            LookDown();
+        }
+        else {
+            if (vTurnSpeed > 0) {
+                vTurnSpeed -= turnAccel * 3 * Time.fixedDeltaTime;
+                if (vTurnSpeed < 0) {
+                    vTurnSpeed = 0;
+                }
+            }
+            else if (vTurnSpeed < 0) {
+                vTurnSpeed += turnAccel * 3 * Time.fixedDeltaTime;
+                if (vTurnSpeed > 0) {
+                    vTurnSpeed = 0;
+                }
+            }
+        }
+
         // Miscellaneous Buttons
         if (Input.GetButtonDown("NoClip")) {
             ToggleNoclip();
         }
 
         CapSpeed();
-        transform.Rotate(new Vector3(0, turnSpeed * Time.fixedDeltaTime, 0));
+        AdjustCamera();
     }
 
     private void Jump() {
@@ -73,11 +98,11 @@ public class Player : MonoBehaviour {
     }
 
     private void MoveForward() {
-        body.velocity += transform.forward * movementAccel * Time.fixedDeltaTime;
+        body.velocity += camera.transform.forward * movementAccel * Time.fixedDeltaTime;
     }
 
     private void MoveBackward() {
-        body.velocity += transform.forward * -1 * movementAccel * Time.fixedDeltaTime;
+        body.velocity += camera.transform.forward * -1 * movementAccel * Time.fixedDeltaTime;
     }
 
     private void TurnLeft() {
@@ -102,6 +127,20 @@ public class Player : MonoBehaviour {
         body.velocity += transform.up * -1 * movementAccel * Time.fixedDeltaTime;
     }
 
+    private void LookUp() {
+        vTurnSpeed -= turnAccel * Time.fixedDeltaTime;
+        if (vTurnSpeed < -maxTurnSpeed) {
+            vTurnSpeed = -maxTurnSpeed;
+        }
+    }
+
+    private void LookDown() {
+        vTurnSpeed += turnAccel * Time.fixedDeltaTime;
+        if (vTurnSpeed > maxTurnSpeed) {
+            vTurnSpeed = maxTurnSpeed;
+        }
+    }
+
     private void CapSpeed() {
         if (Vector3.Scale(body.velocity, new Vector3(1, 0, 1)).sqrMagnitude > maxSpeed * maxSpeed) {
             Vector3 vel = body.velocity.normalized * maxSpeed;
@@ -115,5 +154,10 @@ public class Player : MonoBehaviour {
         Collider c = GetComponent<Collider>();
         c.enabled = !noclip;
         body.useGravity = !noclip;
+    }
+
+    private void AdjustCamera() {
+        camera.transform.localEulerAngles += new Vector3(vTurnSpeed * Time.fixedDeltaTime, turnSpeed * Time.fixedDeltaTime, 0);
+        Vector3 angles = camera.transform.localEulerAngles;
     }
 }
