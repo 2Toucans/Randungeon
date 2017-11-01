@@ -88,6 +88,8 @@ public class Player : MonoBehaviour {
         }
 
         CapSpeed();
+
+        transform.Rotate(new Vector3(0, turnSpeed * Time.fixedDeltaTime, 0));
         AdjustCamera();
     }
 
@@ -98,11 +100,11 @@ public class Player : MonoBehaviour {
     }
 
     private void MoveForward() {
-        body.velocity += camera.transform.forward * movementAccel * Time.fixedDeltaTime;
+        body.velocity += transform.forward * movementAccel * Time.fixedDeltaTime;
     }
 
     private void MoveBackward() {
-        body.velocity += camera.transform.forward * -1 * movementAccel * Time.fixedDeltaTime;
+        body.velocity += transform.forward * -1 * movementAccel * Time.fixedDeltaTime;
     }
 
     private void TurnLeft() {
@@ -157,7 +159,7 @@ public class Player : MonoBehaviour {
     }
 
     private void AdjustCamera() {
-        camera.transform.localEulerAngles += new Vector3(vTurnSpeed * Time.fixedDeltaTime, turnSpeed * Time.fixedDeltaTime, 0);
+        camera.transform.localEulerAngles += new Vector3(vTurnSpeed * Time.fixedDeltaTime, 0, 0);
         Vector3 angles = camera.transform.localEulerAngles;
     }
 }
