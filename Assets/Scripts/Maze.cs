@@ -5,61 +5,81 @@ using UnityEngine;
 public class Maze : MonoBehaviour
 {
     public int sizeX, sizeZ;
-	public GameObject wallPrefab;
-	public GameObject groundPrefab;
+    public GameObject wallPrefab;
+    public GameObject groundPrefab;
+    public Enemy enemyPrefab;
     public const int SIDES = 4;
 
     private bool[,] sectionCleared;
-	private GameObject[,] tiles;
+    private GameObject[,] tiles;
     private int exitIndex;
+    private Enemy enemy;
+    private GameObject ground;
+    private int enemyX, enemyZ;
 
-	// Use this for initialization
-	void Start()
+    // Use this for initialization
+    void Start()
     {
         sectionCleared = new bool[sizeX, sizeZ];
         exitIndex = 1;
 
         tiles = new GameObject[sizeX + 2, sizeZ + 2];
-        
-		for(int i = 0; i < sizeX; i++){
-            for(int j = 0; j < sizeZ; j++){
-                sectionCleared[i,j] = false;
+
+        for (int i = 0; i < sizeX; i++) {
+            for (int j = 0; j < sizeZ; j++) {
+                sectionCleared[i, j] = false;
             }
         }
         //Start digging the maze starting from the top left
-        clearPath(0,0);
-        
+        clearPath(0, 0);
+
         List<int> lastCol = new List<int>();
-        for(int i = 0; i < sizeZ-1; i++)
+        for (int i = 0; i < sizeZ - 1; i++)
         {
-            if(sectionCleared[sizeX-1,i])
+            if (sectionCleared[sizeX - 1, i])
                 lastCol.Add(i);
         }
-        
-        exitIndex = lastCol[Random.Range(0, lastCol.Count-1)] + 1;
 
-        for(int i = 0; i < sizeZ+2; i++)
+        exitIndex = lastCol[Random.Range(0, lastCol.Count - 1)] + 1;
+
+        for (int i = 0; i < sizeZ + 2; i++)
             createTile(0, i);
-        for (int i = 0; i < sizeX; i++){
-            createTile(i+1, 0);
-            for (int j = 0; j < sizeZ; j++){
-                createTile(i+1,j+1);
+        for (int i = 0; i < sizeX; i++) {
+            createTile(i + 1, 0);
+            for (int j = 0; j < sizeZ; j++) {
+                createTile(i + 1, j + 1);
             }
-            createTile(i+1, sizeZ+1);
+            createTile(i + 1, sizeZ + 1);
         }
-        for (int i = 0; i < sizeZ+2; i++)
+        for (int i = 0; i < sizeZ + 2; i++)
             createTile(sizeZ + 1, i);
-		
-		GameObject ground = Instantiate(groundPrefab);
-        ground.transform.Translate(sizeX+1, sizeZ+1, 1);
+
+        ground = Instantiate(groundPrefab);
+        ground.transform.Translate(sizeX + 1, sizeZ + 1, 1);
         ground.transform.localScale += new Vector3(sizeX * 2, sizeZ * 2, 0);
+
+        enemyX = sizeX / 2 + 1;
+
+        lastCol = new List<int>();
+        for (int i = 0; i < sizeZ; i++)
+        {
+            if (sectionCleared[enemyX, i])
+                lastCol.Add(i);
+        }
+
+        enemyZ = lastCol[Random.Range(0, lastCol.Count - 1)];
+
+        enemy = Instantiate(enemyPrefab) as Enemy;
+        enemy.transform.position = new Vector3((enemyX+1)*2, 1, (enemyZ+1)*2);
+        enemy.setPosition(enemyX, enemyZ);
+        enemy.setMaze(sectionCleared);
     }
-	
-	// Update is called once per frame
-	void Update()
+
+    // Update is called once per frame
+    void Update()
     {
-		
-	}
+
+    }
 
     private void createTile(int row, int column)
     {
@@ -74,16 +94,16 @@ public class Maze : MonoBehaviour
     private int getAdj(int column, int row)
     {
         int adj = 0;
-        
-        if(column >= 1 && sectionCleared[column-1,row])
+
+        if (column >= 1 && sectionCleared[column - 1, row])
             adj++;
-        if(column < sizeX-1 && sectionCleared[column+1,row])
+        if (column < sizeX - 1 && sectionCleared[column + 1, row])
             adj++;
-        if(row >= 1 && sectionCleared[column,row-1])
+        if (row >= 1 && sectionCleared[column, row - 1])
             adj++;
-        if(row < sizeZ-1 && sectionCleared[column,row+1])
+        if (row < sizeZ - 1 && sectionCleared[column, row + 1])
             adj++;
-        
+
         return adj;
     }
 
@@ -97,29 +117,29 @@ public class Maze : MonoBehaviour
     private void clearPath(int column, int row) {
         int randDir, temp;
         int max = SIDES;
-        if(column < 0 || column >= sizeX || row < 0 || row >= sizeZ ||
-                getAdj(column, row) > 1 || sectionCleared[column,row])
+        if (column < 0 || column >= sizeX || row < 0 || row >= sizeZ ||
+                getAdj(column, row) > 1 || sectionCleared[column, row])
             return;
-            
-        sectionCleared[column,row] = true;
-        
-        if(column == sizeX-1)
+
+        sectionCleared[column, row] = true;
+
+        if (column == sizeX - 1)
             return;
-            
+
         int[] choices = new int[SIDES];
-        for(int i = 0; i < SIDES; i++)
+        for (int i = 0; i < SIDES; i++)
             choices[i] = i;
-        for(int j = 0; j < SIDES; j++){
+        for (int j = 0; j < SIDES; j++) {
             randDir = Random.Range(0, max--);
-            switch(choices[randDir]){
-                case 0: clearPath(column-1,row);
-                        break;
-                case 1: clearPath(column,row-1);
-                        break;
-                case 2: clearPath(column+1,row);
-                        break;
-                case 3: clearPath(column,row+1);
-                        break;
+            switch (choices[randDir]) {
+                case 0: clearPath(column - 1, row);
+                    break;
+                case 1: clearPath(column, row - 1);
+                    break;
+                case 2: clearPath(column + 1, row);
+                    break;
+                case 3: clearPath(column, row + 1);
+                    break;
             }
             temp = choices[randDir];
             choices[randDir] = choices[max];
@@ -127,8 +147,13 @@ public class Maze : MonoBehaviour
         }
     }
 
-    public bool[,] getMaze()
+    public void Reset()
     {
-        return sectionCleared;
+        foreach(GameObject g in tiles)
+        {
+            Destroy(g);
+        }
+        Destroy(enemy.gameObject);
+        Destroy(ground);
     }
 }

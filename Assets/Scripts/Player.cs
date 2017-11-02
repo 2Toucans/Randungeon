@@ -24,7 +24,11 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-        if (Input.GetButtonDown("Reset")) {
+        if (Input.GetButtonDown("ResetPlayer")) {
+            Reset();
+        }
+        if (Input.GetButtonDown("ResetMaze"))
+        {
             Reset();
         }
         if (Input.GetButtonDown("Jump") && !noclip) {
