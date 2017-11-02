@@ -9,11 +9,15 @@ public class Player : MonoBehaviour {
     public float maxTurnSpeed;
     public float jumpImpulse;
 
-    public Camera camera;
+    public Shader cameraEffectShader;
+
+    public Camera mainCamera;
 
     private float turnSpeed = 0;
     private float vTurnSpeed = 0;
     private bool noclip = false;
+    private bool isNight = false;
+    private bool fogEnabled = false;
 
     private Rigidbody body;
 
@@ -21,9 +25,13 @@ public class Player : MonoBehaviour {
     void Start () {
 	    body = GetComponent<Rigidbody>();
     }
-	
-	// Update is called once per frame
-	void FixedUpdate () {
+
+    private void OnEnable() {
+        mainCamera.SetReplacementShader(cameraEffectShader, null);
+    }
+
+    // Update is called once per frame
+    void FixedUpdate () {
         if (Input.GetButtonDown("Reset")) {
             Reset();
         }
@@ -88,6 +96,14 @@ public class Player : MonoBehaviour {
         // Miscellaneous Buttons
         if (Input.GetButtonDown("NoClip")) {
             ToggleNoclip();
+        }
+
+        if (Input.GetButtonDown("ToggleDay")) {
+            ToggleDay();
+        }
+
+        if (Input.GetButtonDown("ToggleFog")) {
+            ToggleFog();
         }
 
         CapSpeed();
@@ -162,15 +178,25 @@ public class Player : MonoBehaviour {
     }
 
     private void AdjustCamera() {
-        camera.transform.localEulerAngles += new Vector3(vTurnSpeed * Time.fixedDeltaTime, 0, 0);
-        Vector3 angles = camera.transform.localEulerAngles;
+        mainCamera.transform.localEulerAngles += new Vector3(vTurnSpeed * Time.fixedDeltaTime, 0, 0);
+        Vector3 angles = mainCamera.transform.localEulerAngles;
     }
 
     private void Reset() {
         body.velocity = new Vector3(0, 0, 0);
-        camera.transform.localEulerAngles = new Vector3(0, 0, 0);
+        mainCamera.transform.localEulerAngles = new Vector3(0, 0, 0);
         transform.rotation = Quaternion.identity;
         transform.position = new Vector3(2, 0, 2);
         noclip = false;
+    }
+
+    private void ToggleDay() {
+        isNight = !isNight;
+        Shader.SetGlobalInt("_Night", isNight ? 1 : 0);
+    }
+
+    private void ToggleFog() {
+        fogEnabled = !fogEnabled;
+        Shader.SetGlobalInt("_FogEnabled", fogEnabled ? 1 : 0);
     }
 }
