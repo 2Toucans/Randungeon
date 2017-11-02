@@ -58,7 +58,7 @@ public class Maze : MonoBehaviour
         ground.transform.Translate(sizeX + 1, sizeZ + 1, 1);
         ground.transform.localScale += new Vector3(sizeX * 2, sizeZ * 2, 0);
 
-        enemyX = sizeX / 2 + 1;
+        enemyX = sizeX / 2;
 
         lastCol = new List<int>();
         for (int i = 0; i < sizeZ; i++)
@@ -70,7 +70,7 @@ public class Maze : MonoBehaviour
         enemyZ = lastCol[Random.Range(0, lastCol.Count - 1)];
 
         enemy = Instantiate(enemyPrefab) as Enemy;
-        enemy.transform.position = new Vector3((enemyX+1)*2, 1, (enemyZ+1)*2);
+        enemy.transform.position = new Vector3(enemyX * 2 + 2, 0, enemyZ * 2 + 2);
         enemy.setPosition(enemyX, enemyZ);
         enemy.setMaze(sectionCleared);
     }
