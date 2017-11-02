@@ -24,6 +24,7 @@ public class Player : MonoBehaviour {
     // Use this for initialization
     void Start () {
 	    body = GetComponent<Rigidbody>();
+        mainCamera.SetReplacementShader(cameraEffectShader, null);
     }
 
 	// Update is called once per frame
