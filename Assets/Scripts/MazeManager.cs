@@ -14,6 +14,7 @@ public class MazeManager : MonoBehaviour
     
     private void Reset()
     {
+        myMaze.Reset();
         Destroy(myMaze.gameObject);
         Setup();
     }
@@ -27,9 +28,7 @@ public class MazeManager : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
-		if (Input.GetKeyDown(KeyCode.Z))
-        {
-			Reset();
-		}
-	}
+        if (Input.GetButtonDown("ResetMaze"))
+            Reset();
+    }
 }

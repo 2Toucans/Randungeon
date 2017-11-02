@@ -26,13 +26,13 @@ public class Player : MonoBehaviour {
 	    body = GetComponent<Rigidbody>();
     }
 
-    private void OnEnable() {
-        mainCamera.SetReplacementShader(cameraEffectShader, null);
-    }
-
-    // Update is called once per frame
-    void FixedUpdate () {
-        if (Input.GetButtonDown("Reset")) {
+	// Update is called once per frame
+	void FixedUpdate () {
+        if (Input.GetButtonDown("ResetPlayer")) {
+            Reset();
+        }
+        if (Input.GetButtonDown("ResetMaze"))
+        {
             Reset();
         }
         if (Input.GetButtonDown("Jump") && !noclip) {
