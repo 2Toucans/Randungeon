@@ -7,11 +7,12 @@ public class Maze : MonoBehaviour
     public int sizeX, sizeZ;
     public GameObject wallPrefab;
     public GameObject groundPrefab;
+    public GameObject wayPointPrefab;
     public Enemy enemyPrefab;
     public const int SIDES = 4;
 
     private bool[,] sectionCleared;
-    private GameObject[,] tiles;
+    private GameObject[,] walls;
     private int exitIndex;
     private Enemy enemy;
     private GameObject ground;
@@ -23,7 +24,7 @@ public class Maze : MonoBehaviour
         sectionCleared = new bool[sizeX, sizeZ];
         exitIndex = 1;
 
-        tiles = new GameObject[sizeX + 2, sizeZ + 2];
+        walls = new GameObject[sizeX + 2, sizeZ + 2];
 
         for (int i = 0; i < sizeX; i++) {
             for (int j = 0; j < sizeZ; j++) {
@@ -43,22 +44,35 @@ public class Maze : MonoBehaviour
         exitIndex = lastCol[Random.Range(0, lastCol.Count - 1)] + 1;
 
         for (int i = 0; i < sizeZ + 2; i++)
-            createTile(0, i);
+            createWall(0, i);
         for (int i = 0; i < sizeX; i++) {
-            createTile(i + 1, 0);
+            createWall(i + 1, 0);
             for (int j = 0; j < sizeZ; j++) {
-                createTile(i + 1, j + 1);
+                createWall(i + 1, j + 1);
             }
-            createTile(i + 1, sizeZ + 1);
+            createWall(i + 1, sizeZ + 1);
         }
         for (int i = 0; i < sizeZ + 2; i++)
-            createTile(sizeZ + 1, i);
+            createWall(sizeZ + 1, i);
+
+        for (int i = 0; i < walls.GetLength(0)-1; i++)
+        {
+            for (int j = 0; j < walls.GetLength(1)-1; j++)
+            {
+                if (walls[i, j] == null)
+                {
+                    GameObject wp = Instantiate(wayPointPrefab);
+                    wp.transform.position = new Vector3(i, -1, j);
+                    walls[i, j] = wp;
+                }
+            }
+        }
 
         ground = Instantiate(groundPrefab);
         ground.transform.Translate(sizeX + 1, sizeZ + 1, 1);
         ground.transform.localScale += new Vector3(sizeX * 2, sizeZ * 2, 0);
 
-        enemyX = sizeX / 2;
+        enemyX = sizeX / 2 + 1;
 
         lastCol = new List<int>();
         for (int i = 0; i < sizeZ; i++)
@@ -67,12 +81,12 @@ public class Maze : MonoBehaviour
                 lastCol.Add(i);
         }
 
-        enemyZ = lastCol[Random.Range(0, lastCol.Count - 1)];
+        enemyZ = lastCol[Random.Range(0, lastCol.Count - 1)] + 1;
 
         enemy = Instantiate(enemyPrefab) as Enemy;
-        enemy.transform.position = new Vector3(enemyX * 2 + 2, 0, enemyZ * 2 + 2);
+        enemy.transform.position = new Vector3(enemyX * 2, 0, enemyZ * 2);
         enemy.setPosition(enemyX, enemyZ);
-        enemy.setMaze(sectionCleared);
+        enemy.setMaze(walls);
     }
 
     // Update is called once per frame
@@ -81,13 +95,13 @@ public class Maze : MonoBehaviour
 
     }
 
-    private void createTile(int row, int column)
+    private void createWall(int row, int column)
     {
         if (((row == 0 || column == 0 || row == sizeZ + 1 || column == sizeX + 1)
             || !sectionCleared[column - 1, row - 1]) && !(column == sizeX + 1 && row == exitIndex))
         {
-            tiles[column, row] = Instantiate(wallPrefab);
-            tiles[column, row].transform.Translate(column * 2, 0, row * 2);
+            walls[column, row] = Instantiate(wallPrefab);
+            walls[column, row].transform.Translate(column * 2, 0, row * 2);
         }
     }
 
@@ -149,7 +163,7 @@ public class Maze : MonoBehaviour
 
     public void Reset()
     {
-        foreach(GameObject g in tiles)
+        foreach(GameObject g in walls)
         {
             Destroy(g);
         }
