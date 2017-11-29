@@ -9,6 +9,10 @@ public class Player : MonoBehaviour {
     public float maxTurnSpeed;
     public float jumpImpulse;
 
+    public float friction;
+
+    public bool useGravity;
+
     public Shader cameraEffectShader;
 
     public Camera mainCamera;
@@ -19,21 +23,21 @@ public class Player : MonoBehaviour {
     private bool isNight = false;
     private bool fogEnabled = false;
 
-    private Rigidbody body;
+    private Vector3 velocity;
+
+    private CharacterController controller;
 
     // Use this for initialization
     void Start () {
-	    body = GetComponent<Rigidbody>();
+	    controller = GetComponent<CharacterController>();
         mainCamera.SetReplacementShader(cameraEffectShader, null);
     }
 
-	// Update is called once per frame
-	void FixedUpdate () {
+    void Update() {
         if (Input.GetButtonDown("ResetPlayer")) {
             Reset();
         }
-        if (Input.GetButtonDown("ResetMaze"))
-        {
+        if (Input.GetButtonDown("ResetMaze")) {
             Reset();
         }
         if (Input.GetButtonDown("Jump") && !noclip) {
@@ -51,6 +55,9 @@ public class Player : MonoBehaviour {
         else if (Input.GetAxis("Vertical") < -0.4f) {
             MoveBackward();
         }
+        else {
+            ApplyFriction();
+        }
         if (Input.GetAxis("Horizontal") < -0.4f) {
             TurnLeft();
         }
@@ -59,13 +66,13 @@ public class Player : MonoBehaviour {
         }
         else {
             if (turnSpeed > 0) {
-                turnSpeed -= turnAccel * 3 * Time.fixedDeltaTime;
+                turnSpeed -= turnAccel * 3 * Time.deltaTime;
                 if (turnSpeed < 0) {
                     turnSpeed = 0;
                 }
             }
             else if (turnSpeed < 0) {
-                turnSpeed += turnAccel * 3 * Time.fixedDeltaTime;
+                turnSpeed += turnAccel * 3 * Time.deltaTime;
                 if (turnSpeed > 0) {
                     turnSpeed = 0;
                 }
@@ -81,13 +88,13 @@ public class Player : MonoBehaviour {
         }
         else {
             if (vTurnSpeed > 0) {
-                vTurnSpeed -= turnAccel * 3 * Time.fixedDeltaTime;
+                vTurnSpeed -= turnAccel * 3 * Time.deltaTime;
                 if (vTurnSpeed < 0) {
                     vTurnSpeed = 0;
                 }
             }
             else if (vTurnSpeed < 0) {
-                vTurnSpeed += turnAccel * 3 * Time.fixedDeltaTime;
+                vTurnSpeed += turnAccel * 3 * Time.deltaTime;
                 if (vTurnSpeed > 0) {
                     vTurnSpeed = 0;
                 }
@@ -106,85 +113,113 @@ public class Player : MonoBehaviour {
         if (Input.GetButtonDown("ToggleFog")) {
             ToggleFog();
         }
+    }
 
+	// Update is called once per frame
+	void FixedUpdate () {
+        AddGravity();
+        ApplyFriction();
         CapSpeed();
 
-        transform.Rotate(new Vector3(0, turnSpeed * Time.fixedDeltaTime, 0));
+        controller.Move(velocity * Time.deltaTime);
+
+        transform.Rotate(new Vector3(0, turnSpeed * Time.deltaTime, 0));
         AdjustCamera();
+
+        velocity = controller.velocity;
     }
 
     private void Jump() {
         if (Physics.Raycast(transform.position, -transform.up, 1.25f)) {
-            body.velocity += transform.up * jumpImpulse;
+            velocity += transform.up * jumpImpulse;
         }
     }
 
     private void MoveForward() {
-        body.velocity += transform.forward * movementAccel * Time.fixedDeltaTime;
+        velocity += transform.forward * movementAccel * Time.deltaTime;
     }
 
     private void MoveBackward() {
-        body.velocity += transform.forward * -1 * movementAccel * Time.fixedDeltaTime;
+        velocity += transform.forward * -1 * movementAccel * Time.deltaTime;
+    }
+
+    private void AddGravity() {
+        if (useGravity) {
+            velocity += Physics.gravity * 0.1f;
+        }
     }
 
     private void TurnLeft() {
-        turnSpeed -= turnAccel * Time.fixedDeltaTime;
+        turnSpeed -= turnAccel * Time.deltaTime;
         if (turnSpeed < -maxTurnSpeed) {
             turnSpeed = -maxTurnSpeed;
         }
     }
 
     private void TurnRight() {
-        turnSpeed += turnAccel * Time.fixedDeltaTime;
+        turnSpeed += turnAccel * Time.deltaTime;
         if (turnSpeed > maxTurnSpeed) {
             turnSpeed = maxTurnSpeed;
         }
     }
 
     private void MoveUp() {
-        body.velocity += transform.up * movementAccel * Time.fixedDeltaTime;
+        velocity += transform.up * movementAccel * Time.deltaTime;
     }
 
     private void MoveDown() {
-        body.velocity += transform.up * -1 * movementAccel * Time.fixedDeltaTime;
+        velocity += transform.up * -1 * movementAccel * Time.deltaTime;
+    }
+
+    private void ApplyFriction() {
+        Vector3 xVel = Vector3.Scale(velocity, new Vector3(1, 0, 1));
+        if (velocity.sqrMagnitude > 0) {
+            velocity -= xVel.normalized * friction * Time.deltaTime;
+            if (Vector3.Dot(Vector3.Scale(velocity, new Vector3(1, 0, 1)), xVel) < 0) {
+                velocity = Vector3.Scale(velocity, Vector3.up);
+            }
+        }
+        else {
+
+        }
     }
 
     private void LookUp() {
-        vTurnSpeed -= turnAccel * Time.fixedDeltaTime;
-        if (vTurnSpeed < -maxTurnSpeed) {
+        vTurnSpeed -= turnAccel * Time.deltaTime;
+        if (vTurnSpeed< -maxTurnSpeed) {
             vTurnSpeed = -maxTurnSpeed;
         }
     }
 
     private void LookDown() {
-        vTurnSpeed += turnAccel * Time.fixedDeltaTime;
+        vTurnSpeed += turnAccel * Time.deltaTime;
         if (vTurnSpeed > maxTurnSpeed) {
             vTurnSpeed = maxTurnSpeed;
         }
     }
 
     private void CapSpeed() {
-        if (Vector3.Scale(body.velocity, new Vector3(1, 0, 1)).sqrMagnitude > maxSpeed * maxSpeed) {
-            Vector3 vel = body.velocity.normalized * maxSpeed;
-            body.velocity = Vector3.Scale(body.velocity, Vector3.up)
+        float dSpeed = maxSpeed;
+        if (Vector3.Scale(velocity, new Vector3(1, 0, 1)).sqrMagnitude > dSpeed * dSpeed) {
+            Vector3 vel = velocity.normalized * dSpeed;
+            velocity = Vector3.Scale(velocity, Vector3.up)
                 + Vector3.Scale(vel, new Vector3(1, 0, 1));
         }
     }
 
     private void ToggleNoclip() {
         noclip = !noclip;
-        Collider c = GetComponent<Collider>();
-        c.enabled = !noclip;
-        body.useGravity = !noclip;
+        controller.detectCollisions = !noclip;
+        useGravity = !noclip;
     }
 
     private void AdjustCamera() {
-        mainCamera.transform.localEulerAngles += new Vector3(vTurnSpeed * Time.fixedDeltaTime, 0, 0);
+        mainCamera.transform.localEulerAngles += new Vector3(vTurnSpeed * Time.deltaTime, 0, 0);
         Vector3 angles = mainCamera.transform.localEulerAngles;
     }
 
     private void Reset() {
-        body.velocity = new Vector3(0, 0, 0);
+        velocity = new Vector3(0, 0, 0);
         mainCamera.transform.localEulerAngles = new Vector3(0, 0, 0);
         transform.rotation = Quaternion.identity;
         transform.position = new Vector3(2, 0, 2);
