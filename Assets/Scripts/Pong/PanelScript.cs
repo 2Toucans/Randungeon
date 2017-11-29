@@ -8,6 +8,7 @@ public class PanelScript : MonoBehaviour
 {
 
     public Button yesButton;
+    public Button noButton;
     public GameObject panelObject;
 
     private static PanelScript panelScript;
@@ -21,14 +22,19 @@ public class PanelScript : MonoBehaviour
         return panelScript;
     }
 
-    public void ButtonEvent(UnityAction yesEvent)
+    public void ButtonEvent(UnityAction yesEvent, UnityAction noEvent)
     {
         panelObject.SetActive(true);
+
         yesButton.onClick.RemoveAllListeners();
         yesButton.onClick.AddListener(yesEvent);
         yesButton.onClick.AddListener(ClosePanel);
-
         yesButton.gameObject.SetActive(true);
+
+        noButton.onClick.RemoveAllListeners();
+        noButton.onClick.AddListener(noEvent);
+        noButton.onClick.AddListener(ClosePanel);
+        noButton.gameObject.SetActive(true);
     }
 
     void ClosePanel()

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PongDoor : MonoBehaviour {
 
@@ -16,6 +17,9 @@ public class PongDoor : MonoBehaviour {
 
     void OnTriggerEnter(Collider hitInfo)
     {
-
+        if(hitInfo.name == "PlayerPrefab")
+        {
+            SceneManager.LoadScene("PongScene");
+        }
     }
 }

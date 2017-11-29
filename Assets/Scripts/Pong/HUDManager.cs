@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class HUDManager : MonoBehaviour
 {
@@ -36,13 +37,13 @@ public class HUDManager : MonoBehaviour
         {
             HUDText.text = p1Score.ToString("G") + " - " + p2Score.ToString("G")
                 + "\nPLAYER ONE WINS";
-            panelScript.ButtonEvent(ResetGame);
+            panelScript.ButtonEvent(ResetGame, ExitGame);
         }
         else if (p2Score == 10)
         {
             HUDText.text = p1Score.ToString("G") + " - " + p2Score.ToString("G")
                 + "\nPLAYER TWO WINS";
-            panelScript.ButtonEvent(ResetGame);
+            panelScript.ButtonEvent(ResetGame, ExitGame);
         }
 
         if (Input.GetKeyDown(KeyCode.C))
@@ -73,6 +74,11 @@ public class HUDManager : MonoBehaviour
         p1Score = 0;
         p2Score = 0;
         myBall.SendMessage("ResetBall", 0.5f, SendMessageOptions.RequireReceiver);
+    }
+
+    public void ExitGame()
+    {
+        SceneManager.LoadScene("MainScene");
     }
 
     public void EnterCommand()
