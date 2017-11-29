@@ -7,6 +7,7 @@ public class MazeManager : MonoBehaviour
     public static MazeManager manager;
     public static bool[,] mazeData;
     public static int exitIndex;
+    public static float pXExit, pZExit;
     public Maze mazePrefab;
     private Maze myMaze;
     
@@ -14,6 +15,8 @@ public class MazeManager : MonoBehaviour
     {
         myMaze.Reset();
         Destroy(myMaze.gameObject);
+        mazeData = null;
+        exitIndex = -1;
         myMaze = Instantiate(mazePrefab) as Maze;
     }
     
@@ -26,7 +29,6 @@ public class MazeManager : MonoBehaviour
 
             manager = this;
         }
-
         myMaze = Instantiate(mazePrefab) as Maze;
     }
 	
@@ -35,5 +37,41 @@ public class MazeManager : MonoBehaviour
     {
         if (Input.GetButtonDown("ResetMaze"))
             Reset();
+    }
+
+    public void SetMaze(bool[,] m)
+    {
+        mazeData = m;
+    }
+
+    public void SetExit(int e)
+    {
+        exitIndex = e;
+    }
+
+    public void SetExitCoords(float x, float z)
+    {
+        pXExit = x;
+        pZExit = z;
+    }
+
+    public bool[,] GetMazeData()
+    {
+        return mazeData;
+    }
+
+    public int GetExit()
+    {
+        return exitIndex;
+    }
+
+    public float GetExitX()
+    {
+        return pXExit;
+    }
+
+    public float GetExitZ()
+    {
+        return pZExit;
     }
 }
