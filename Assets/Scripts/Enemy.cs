@@ -56,8 +56,7 @@ public class Enemy : MonoBehaviour
             //Debug.Log("change direction");
             if (maze[startX, startZ - 1].GetComponent<WayPoint>() != null)
                 validDests.Add(new Vector2(0, -1));
-            if (maze[startX + 1, startZ] != null
-                && maze[startX + 1, startZ].GetComponent<WayPoint>() != null)
+            if (maze[startX + 1, startZ].GetComponent<WayPoint>() != null)
                 validDests.Add(new Vector2(1, 0));
             if (maze[startX, startZ + 1].GetComponent<WayPoint>() != null)
                 validDests.Add(new Vector2(0, 1));
@@ -72,8 +71,6 @@ public class Enemy : MonoBehaviour
         xDir = (int)rand.x;
         zDir = (int)rand.y;
         chosenDest = maze[startX+xDir, startZ+zDir].transform.position;
-        chosenDest.x *= 2;
-        chosenDest.z *= 2;
 
         //Debug.Log("X= " + startX*2 + " Z= " + startZ*2);
         //Debug.Log("xDir= " + xDir + " zDir= " + zDir);
