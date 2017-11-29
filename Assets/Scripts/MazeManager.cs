@@ -4,26 +4,31 @@ using UnityEngine;
 
 public class MazeManager : MonoBehaviour
 {
+    public static MazeManager manager;
+    public static bool[,] mazeData;
+    public static int exitIndex;
     public Maze mazePrefab;
-	private Maze myMaze;
-
-    private void Setup()
-    {
-        myMaze = Instantiate(mazePrefab) as Maze;
-    }
+    private Maze myMaze;
     
     private void Reset()
     {
         myMaze.Reset();
         Destroy(myMaze.gameObject);
-        Setup();
+        myMaze = Instantiate(mazePrefab) as Maze;
     }
     
 	// Use this for initialization
-	void Start()
+	void Awake()
     {
-		Setup();
-	}
+        if (manager == null)
+        {
+            DontDestroyOnLoad(gameObject);
+
+            manager = this;
+        }
+
+        myMaze = Instantiate(mazePrefab) as Maze;
+    }
 	
 	// Update is called once per frame
 	void Update()
