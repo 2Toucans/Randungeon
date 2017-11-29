@@ -8,6 +8,7 @@ public class Maze : MonoBehaviour
     public GameObject wallPrefab;
     public GameObject groundPrefab;
     public GameObject wayPointPrefab;
+    public GameObject doorPrefab;
     public Enemy enemyPrefab;
     public const int SIDES = 4;
 
@@ -42,6 +43,9 @@ public class Maze : MonoBehaviour
         }
 
         exitIndex = lastCol[Random.Range(0, lastCol.Count - 1)] + 1;
+        GameObject exit = Instantiate(doorPrefab);
+        exit.transform.position = new Vector3((sizeX + 1) * 2, 0, exitIndex * 2);
+        walls[sizeX + 1, exitIndex] = exit;
 
         for (int i = 0; i < sizeZ + 2; i++)
             createWall(0, i);
@@ -55,14 +59,14 @@ public class Maze : MonoBehaviour
         for (int i = 0; i < sizeZ + 2; i++)
             createWall(sizeZ + 1, i);
 
-        for (int i = 0; i < walls.GetLength(0)-1; i++)
+        for (int i = 1; i < walls.GetLength(0)-1; i++)
         {
-            for (int j = 0; j < walls.GetLength(1)-1; j++)
+            for (int j = 1; j < walls.GetLength(1)-1; j++)
             {
                 if (walls[i, j] == null)
                 {
                     GameObject wp = Instantiate(wayPointPrefab);
-                    wp.transform.position = new Vector3(i, -1, j);
+                    wp.transform.position = new Vector3(i*2, -1, j*2);
                     walls[i, j] = wp;
                 }
             }
