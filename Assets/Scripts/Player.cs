@@ -17,6 +17,8 @@ public class Player : MonoBehaviour {
 
     public Camera mainCamera;
 
+    public Light worldLight;
+
     private float turnSpeed = 0;
     private float vTurnSpeed = 0;
     private bool noclip = false;
@@ -236,6 +238,10 @@ public class Player : MonoBehaviour {
 
     private void ToggleDay() {
         isNight = !isNight;
+        if (worldLight != null) {
+            worldLight.transform.Rotate(new Vector3(isNight ? -70 : 70, 0, 0));
+            worldLight.intensity = isNight ? 0 : 1;
+        }
         Shader.SetGlobalInt("_Night", isNight ? 1 : 0);
     }
 

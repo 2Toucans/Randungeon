@@ -65,7 +65,7 @@
 			#include "UnityCG.cginc"
 
 			#define FOG_COLOR fixed4(0.68, 0.68, 0.8, 1)
-			#define FOG_DISTANCE 0.15
+			#define FOG_DISTANCE 0.2
 
 			uniform int _FogEnabled;
 
@@ -85,8 +85,9 @@
 			}
 
 			fixed4 frag(fInput i) : SV_TARGET{
-				fixed fogStrength = (1 - i.position.z * FOG_DISTANCE * _ProjectionParams.z);
-				fixed4 fogLight = FOG_COLOR * fogStrength * (_FogEnabled ? 1 : 0);
+				fixed fogStrength = (1.25 - i.position.z * FOG_DISTANCE * _ProjectionParams.z);
+				fixed4 fogLight = FOG_COLOR * (_FogEnabled ? 1 : 0);
+				fogLight.w *= fogStrength;
 				return fogLight;
 			}
 
@@ -104,7 +105,7 @@
 
 			#include "UnityCG.cginc"
 
-			#define AMBIENT_LIGHT_COLOR fixed4(0.221, 0.18, 0.25, 1)
+			#define AMBIENT_LIGHT_COLOR fixed4(0.221, 0.19, 0.18, 1)
 			#define FLASHLIGHT_COLOR fixed4(0.9, 0.82, 0.52, 1)
 
 			#define FLASHLIGHT_SPREAD 100
