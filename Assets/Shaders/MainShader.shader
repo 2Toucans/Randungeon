@@ -112,7 +112,7 @@
 			#define FLASHLIGHT_FALLOFF 1
 
 			uniform int _Night;
-			uniform int _Flashlight;
+			uniform int _FlashlightEnabled;
 
 			struct vInput {
 				float4 vertex : POSITION;
@@ -135,7 +135,7 @@
 				fixed dst = 1 - (i.position.z * 100);
 				int flashRegion = (length(posDiff) < FLASHLIGHT_INITIAL_SIZE + (dst * FLASHLIGHT_SPREAD)) ? 1 : 0;
 				fixed4 ambientLight = AMBIENT_LIGHT_COLOR * (_Night ? 0 : 1);
-				fixed4 flashLight = FLASHLIGHT_COLOR * flashRegion;
+				fixed4 flashLight = FLASHLIGHT_COLOR * flashRegion * _FlashlightEnabled;
 				flashLight *= clamp(1 - dst * dst * FLASHLIGHT_FALLOFF, 0, 1);
 				flashLight.w = 1;
 				return ambientLight + flashLight;
