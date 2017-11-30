@@ -20,9 +20,9 @@ public class Player : MonoBehaviour {
     private float turnSpeed = 0;
     private float vTurnSpeed = 0;
     private bool noclip = false;
-    private bool isNight = false;
-    private bool flashlightEnabled = false;
-    private bool fogEnabled = false;
+    public bool isNight = false;
+    public bool flashlightEnabled = false;
+    public bool fogEnabled = false;
 
     private Vector3 velocity;
 
@@ -32,6 +32,9 @@ public class Player : MonoBehaviour {
     void Start () {
 	    controller = GetComponent<CharacterController>();
         mainCamera.SetReplacementShader(cameraEffectShader, null);
+        Shader.SetGlobalInt("_Night", 0);
+        Shader.SetGlobalInt("_FogEnabled", 0);
+        Shader.SetGlobalInt("_FlashlightEnabled", 0);
     }
 
     void Update() {

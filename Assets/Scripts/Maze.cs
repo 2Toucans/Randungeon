@@ -113,6 +113,9 @@ public class Maze : MonoBehaviour
         enemy.transform.position = new Vector3(enemyX * 2, 0, enemyZ * 2);
         enemy.setPosition(enemyX, enemyZ);
         enemy.setMaze(walls);
+
+        SoundManager soundMan = GameObject.Find("Sound").GetComponent<SoundManager>();
+        soundMan.skelington = enemy.gameObject;
     }
 
     // Update is called once per frame
