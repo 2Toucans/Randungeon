@@ -8,26 +8,28 @@ public class Player : MonoBehaviour {
     public float turnAccel;
     public float maxTurnSpeed;
     public float jumpImpulse;
-
+    public float throwForce;
     public float friction;
-
     public bool useGravity;
-
     public Shader cameraEffectShader;
-
     public Camera mainCamera;
+    public PlayerBall playerBallPrefab;
 
     public Light worldLight;
 
     private float turnSpeed = 0;
     private float vTurnSpeed = 0;
     private bool noclip = false;
+
     public bool isNight = false;
     public bool flashlightEnabled = false;
     public bool fogEnabled = false;
 
+    private bool isNight = false;
+    private bool flashlightEnabled = false;
+    private bool fogEnabled = false;
+	
     private Vector3 velocity;
-
     private CharacterController controller;
 
     // Use this for initialization
@@ -45,6 +47,9 @@ public class Player : MonoBehaviour {
         }
         if (Input.GetButtonDown("ResetMaze")) {
             Reset();
+        }
+        if (Input.GetButtonDown("ThrowBall")) {
+            ThrowBall();
         }
         if (Input.GetButtonDown("Jump") && !noclip) {
             Jump();
@@ -248,6 +253,16 @@ public class Player : MonoBehaviour {
     private void ToggleFog() {
         fogEnabled = !fogEnabled;
         Shader.SetGlobalInt("_FogEnabled", fogEnabled ? 1 : 0);
+    }
+
+    private void ThrowBall()
+    {
+        PlayerBall ball = Instantiate(playerBallPrefab) as PlayerBall;
+        ball.GetComponent<Rigidbody>().useGravity = true;
+        ball.GetComponent<Rigidbody>().detectCollisions = true;
+        ball.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
+        ball.transform.position = this.mainCamera.transform.position + this.mainCamera.transform.forward;
+        ball.GetComponent<Rigidbody>().AddForce((mainCamera.transform.forward) * throwForce);
     }
 
     private void ToggleFlashlight() {

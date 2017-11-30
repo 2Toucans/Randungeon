@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MazeManager : MonoBehaviour
 {
@@ -10,7 +11,10 @@ public class MazeManager : MonoBehaviour
     public static int exitIndex;
     public static float pXPos, pZPos;
     public static int myScore;
+
     public Maze mazePrefab;
+    public Text scoreText;
+
     private Transform player;
     private Maze myMaze;
     private string fileName;
@@ -40,6 +44,7 @@ public class MazeManager : MonoBehaviour
         player = GameObject.Find("PlayerPrefab").transform;
         pXPos = 2;
         pZPos = 2;
+        myScore = 0;
 
         if (manager == null)
         {
@@ -61,6 +66,8 @@ public class MazeManager : MonoBehaviour
             Reset();
         if (Input.GetButtonDown("Save") && fileName != null)
             Save();
+
+        scoreText.text = "Score: " + myScore.ToString("G");
     }
 
     public void SetMaze(bool[,] m)
@@ -104,7 +111,7 @@ public class MazeManager : MonoBehaviour
         pXPos = player.position.x;
         pZPos = player.position.z;
 
-        Debug.Log("Saving " + pXPos + " " + pZPos);
+        Debug.Log("Saving File");
 
         if(File.Exists(fileName))
         {
@@ -113,6 +120,7 @@ public class MazeManager : MonoBehaviour
 
         BinaryFormatter bf = new BinaryFormatter();
         FileStream fs = new FileStream(fileName, FileMode.Append);
+
         bf.Serialize(fs, myScore);
         bf.Serialize(fs, exitIndex);
         bf.Serialize(fs, pXPos);
@@ -133,7 +141,8 @@ public class MazeManager : MonoBehaviour
                 pXPos = (float)bf.Deserialize(fs);
                 pZPos = (float)bf.Deserialize(fs);
                 mazeData = (bool[,])bf.Deserialize(fs);
-            } catch(System.Exception e)
+            }
+            catch (System.Exception e)
             {
                 File.Delete(fileName);
                 mazeData = null;
@@ -149,5 +158,10 @@ public class MazeManager : MonoBehaviour
             pXPos = 2;
             pZPos = 2;
         }
+    }
+
+    public void ScorePoint()
+    {
+        myScore++;
     }
 }

@@ -8,8 +8,9 @@ Space for jumping and moving up in noclip
 Home resets the player
 Z resets the maze and the player and deletes save file
 T toggles day/night
-F toggles fog
-E toggles flashlight
+G toggles fog
+F toggles flashlight
+E throw ball
 P saves file
 
 Commands for Pong:
