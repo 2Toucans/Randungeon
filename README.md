@@ -6,12 +6,14 @@ WASD or arrow keys for movement
 Left Shift for moving down in noclip
 Space for jumping and moving up in noclip
 Home resets the player
-Z resets the maze and the player
+Z resets the maze and the player and deletes save file
 T toggles day/night
 F toggles fog
+P saves file
 
-day/night and fog stopped activating for some reason
-enemy is currently not moving
+Commands for Pong:
+Nighttime - darkens sky
+Gottagofast - speeds up ball
 
 This version has the day/night and fog working
 It was a one-line fix, most of the code was still there but it just wasn't enabled
