@@ -24,13 +24,10 @@ public class Player : MonoBehaviour {
     public bool isNight = false;
     public bool flashlightEnabled = false;
     public bool fogEnabled = false;
-
-    private bool isNight = false;
-    private bool flashlightEnabled = false;
-    private bool fogEnabled = false;
 	
     private Vector3 velocity;
     private CharacterController controller;
+    private SoundManager soundMan;
 
     // Use this for initialization
     void Start () {
@@ -39,6 +36,7 @@ public class Player : MonoBehaviour {
         Shader.SetGlobalInt("_Night", 0);
         Shader.SetGlobalInt("_FogEnabled", 0);
         Shader.SetGlobalInt("_FlashlightEnabled", 0);
+        soundMan = GameObject.Find("Sound").GetComponent<SoundManager>();
     }
 
     void Update() {
@@ -152,10 +150,13 @@ public class Player : MonoBehaviour {
 
     private void MoveForward() {
         velocity += transform.forward * movementAccel * Time.deltaTime;
+        soundMan.PlayWalking();
+
     }
 
     private void MoveBackward() {
         velocity += transform.forward * -1 * movementAccel * Time.deltaTime;
+        soundMan.PlayWalking();
     }
 
     private void AddGravity() {
@@ -268,5 +269,13 @@ public class Player : MonoBehaviour {
     private void ToggleFlashlight() {
         flashlightEnabled = !flashlightEnabled;
         Shader.SetGlobalInt("_FlashlightEnabled", flashlightEnabled ? 1 : 0);
+    }
+
+    void OnControllerColliderHit(ControllerColliderHit hitInfo)
+    {
+        if(hitInfo.collider.GetComponent<MazeWall>() != null)
+        {
+            soundMan.PlayCollision();
+        }
     }
 }
