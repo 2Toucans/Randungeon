@@ -94,7 +94,6 @@ public class SoundManager : MonoBehaviour {
         if (!isWalking && !colliding)
         {
             isWalking = true;
-            Debug.Log("Collision Sound");
             sounds.clip = walking;
             sounds.Play();
         }
