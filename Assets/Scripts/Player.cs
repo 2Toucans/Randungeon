@@ -21,6 +21,7 @@ public class Player : MonoBehaviour {
     private float vTurnSpeed = 0;
     private bool noclip = false;
     private bool isNight = false;
+    private bool flashlightEnabled = false;
     private bool fogEnabled = false;
 
     private Vector3 velocity;
@@ -112,6 +113,10 @@ public class Player : MonoBehaviour {
 
         if (Input.GetButtonDown("ToggleFog")) {
             ToggleFog();
+        }
+
+        if (Input.GetButtonDown("ToggleFlashlight")) {
+            ToggleFlashlight();
         }
     }
 
@@ -234,5 +239,10 @@ public class Player : MonoBehaviour {
     private void ToggleFog() {
         fogEnabled = !fogEnabled;
         Shader.SetGlobalInt("_FogEnabled", fogEnabled ? 1 : 0);
+    }
+
+    private void ToggleFlashlight() {
+        flashlightEnabled = !flashlightEnabled;
+        Shader.SetGlobalInt("_FlashlightEnabled", flashlightEnabled ? 1 : 0);
     }
 }

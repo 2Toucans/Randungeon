@@ -64,8 +64,8 @@
 
 			#include "UnityCG.cginc"
 
-			#define FOG_COLOR fixed4(0.75, 0.75, 0.85, 1)
-			#define FOG_DISTANCE 0.2
+			#define FOG_COLOR fixed4(0.68, 0.68, 0.8, 1)
+			#define FOG_DISTANCE 0.15
 
 			uniform int _FogEnabled;
 
@@ -85,7 +85,7 @@
 			}
 
 			fixed4 frag(fInput i) : SV_TARGET{
-				fixed fogStrength = (1 - i.position.z * FOG_DISTANCE / _ProjectionParams.w);
+				fixed fogStrength = (1 - i.position.z * FOG_DISTANCE * _ProjectionParams.z);
 				fixed4 fogLight = FOG_COLOR * fogStrength * (_FogEnabled ? 1 : 0);
 				return fogLight;
 			}
@@ -93,7 +93,7 @@
 			ENDCG
 		}
 		Pass {
-			Name "AMBIENT_PASS"
+			Name "LIGHT_PASS"
 			Cull Off
 			ZWrite Off
 			Blend SrcAlpha One
@@ -104,9 +104,15 @@
 
 			#include "UnityCG.cginc"
 
-			#define AMBIENT_LIGHT_COLOR fixed4(0.884, 0.72, 1, 0.25)
+			#define AMBIENT_LIGHT_COLOR fixed4(0.221, 0.18, 0.25, 1)
+			#define FLASHLIGHT_COLOR fixed4(0.9, 0.82, 0.52, 1)
+
+			#define FLASHLIGHT_SPREAD 100
+			#define FLASHLIGHT_INITIAL_SIZE 100
+			#define FLASHLIGHT_FALLOFF 1
 
 			uniform int _Night;
+			uniform int _FlashlightEnabled;
 
 			struct vInput {
 				float4 vertex : POSITION;
@@ -124,12 +130,18 @@
 			}
 
 			fixed4 frag(fInput i) : SV_TARGET {
+				fixed2 flashlightPos = fixed2(_ScreenParams.x / 2, _ScreenParams.y / 3);
+				fixed2 posDiff = fixed2(i.position.x - flashlightPos.x, i.position.y - flashlightPos.y);
+				fixed dst = 1 - (i.position.z * 100);
+				int flashRegion = (length(posDiff) < FLASHLIGHT_INITIAL_SIZE + (dst * FLASHLIGHT_SPREAD)) ? 1 : 0;
 				fixed4 ambientLight = AMBIENT_LIGHT_COLOR * (_Night ? 0 : 1);
-				return ambientLight;
+				fixed4 flashLight = FLASHLIGHT_COLOR * flashRegion * _FlashlightEnabled;
+				flashLight *= clamp(1 - dst * dst * FLASHLIGHT_FALLOFF, 0, 1);
+				flashLight.w = 1;
+				return ambientLight + flashLight;
 			}
 
 			ENDCG
 		}
-		
 	}
 }
