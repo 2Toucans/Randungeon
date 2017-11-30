@@ -104,7 +104,7 @@ public class MazeManager : MonoBehaviour
         pXPos = player.position.x;
         pZPos = player.position.z;
 
-        Debug.Log("Saving " + pXPos + " " + pZPos);
+        Debug.Log("Saving File");
 
         if(File.Exists(fileName))
         {
@@ -113,6 +113,7 @@ public class MazeManager : MonoBehaviour
 
         BinaryFormatter bf = new BinaryFormatter();
         FileStream fs = new FileStream(fileName, FileMode.Append);
+
         bf.Serialize(fs, myScore);
         bf.Serialize(fs, exitIndex);
         bf.Serialize(fs, pXPos);
@@ -133,7 +134,8 @@ public class MazeManager : MonoBehaviour
                 pXPos = (float)bf.Deserialize(fs);
                 pZPos = (float)bf.Deserialize(fs);
                 mazeData = (bool[,])bf.Deserialize(fs);
-            } catch(System.Exception e)
+            }
+            catch (System.Exception e)
             {
                 File.Delete(fileName);
                 mazeData = null;
@@ -149,5 +151,10 @@ public class MazeManager : MonoBehaviour
             pXPos = 2;
             pZPos = 2;
         }
+    }
+
+    public void ScorePoint()
+    {
+        myScore++;
     }
 }
