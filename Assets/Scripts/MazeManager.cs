@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MazeManager : MonoBehaviour
 {
@@ -10,7 +11,10 @@ public class MazeManager : MonoBehaviour
     public static int exitIndex;
     public static float pXPos, pZPos;
     public static int myScore;
+
     public Maze mazePrefab;
+    public Text scoreText;
+
     private Transform player;
     private Maze myMaze;
     private string fileName;
@@ -40,6 +44,7 @@ public class MazeManager : MonoBehaviour
         player = GameObject.Find("PlayerPrefab").transform;
         pXPos = 2;
         pZPos = 2;
+        myScore = 0;
 
         if (manager == null)
         {
@@ -61,6 +66,8 @@ public class MazeManager : MonoBehaviour
             Reset();
         if (Input.GetButtonDown("Save") && fileName != null)
             Save();
+
+        scoreText.text = "Score: " + myScore.ToString("G");
     }
 
     public void SetMaze(bool[,] m)

@@ -23,13 +23,9 @@ public class PlayerBall : MonoBehaviour
 
     void OnTriggerEnter(Collider hitInfo)
     {
-        if(hitInfo.gameObject.name == "SkeletonPrefab")
+        if (hitInfo.name == "SkeletonTrigger")
         {
             GameObject.Find("MazeManagerPrefab").GetComponent<MazeManager>().ScorePoint();
-            Destroy(gameObject);
-        }
-        else if(hitInfo.gameObject.name == "MazeWallPrefab" || hitInfo.gameObject.name == "GroundPrefab")
-        {
             Destroy(gameObject);
         }
     }
