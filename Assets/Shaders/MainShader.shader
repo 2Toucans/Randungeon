@@ -57,6 +57,7 @@
 			ZWrite Off
 			Blend SrcAlpha OneMinusSrcAlpha
 			CGPROGRAM
+			#pragma target 4.0
 			#pragma vertex vert
 			#pragma fragment frag
 			#pragma debug
@@ -73,7 +74,7 @@
 			};
 
 			struct fInput {
-				float4 position : SV_POSITION;
+				float4 position : POSITION;
 			};
 
 			fInput vert(vInput i) {
