@@ -15,12 +15,20 @@ public class Player : MonoBehaviour {
     public Camera mainCamera;
     public PlayerBall playerBallPrefab;
 
+    public Light worldLight;
+
     private float turnSpeed = 0;
     private float vTurnSpeed = 0;
     private bool noclip = false;
+
+    public bool isNight = false;
+    public bool flashlightEnabled = false;
+    public bool fogEnabled = false;
+
     private bool isNight = false;
     private bool flashlightEnabled = false;
     private bool fogEnabled = false;
+	
     private Vector3 velocity;
     private CharacterController controller;
 
@@ -28,6 +36,9 @@ public class Player : MonoBehaviour {
     void Start () {
 	    controller = GetComponent<CharacterController>();
         mainCamera.SetReplacementShader(cameraEffectShader, null);
+        Shader.SetGlobalInt("_Night", 0);
+        Shader.SetGlobalInt("_FogEnabled", 0);
+        Shader.SetGlobalInt("_FlashlightEnabled", 0);
     }
 
     void Update() {
@@ -232,6 +243,10 @@ public class Player : MonoBehaviour {
 
     private void ToggleDay() {
         isNight = !isNight;
+        if (worldLight != null) {
+            worldLight.transform.Rotate(new Vector3(isNight ? -70 : 70, 0, 0));
+            worldLight.intensity = isNight ? 0 : 1;
+        }
         Shader.SetGlobalInt("_Night", isNight ? 1 : 0);
     }
 
