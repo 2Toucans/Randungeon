@@ -15,7 +15,7 @@ public class Ball : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        if(Input.GetKeyDown(KeyCode.Space) && !moving)
+        if(Input.GetButtonDown("ThrowPong") && !moving)
         {
             moving = true;
             float initDirection = Random.value;

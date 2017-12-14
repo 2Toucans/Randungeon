@@ -60,7 +60,6 @@
 			#pragma target 4.0
 			#pragma vertex vert
 			#pragma fragment frag
-			#pragma debug
 
 			#include "UnityCG.cginc"
 
@@ -99,9 +98,9 @@
 			ZWrite Off
 			Blend SrcAlpha One
 			CGPROGRAM
+			#pragma target 4.0
 			#pragma vertex vert
 			#pragma fragment frag
-			#pragma debug
 
 			#include "UnityCG.cginc"
 

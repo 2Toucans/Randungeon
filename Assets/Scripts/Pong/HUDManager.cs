@@ -46,6 +46,11 @@ public class HUDManager : MonoBehaviour
             panelScript.ButtonEvent(ResetGame, ExitGame);
         }
 
+        if (p1Score == 10 || p2Score == 10 && Input.GetButtonDown("EndPong"))
+        {
+            ExitGame();
+        }
+
         if (Input.GetKeyDown(KeyCode.C))
         {
             if(cmdOpen)

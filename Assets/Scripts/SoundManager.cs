@@ -14,9 +14,9 @@ public class SoundManager : MonoBehaviour {
 
     private bool playingDayMusic;
     private bool colliding;
-    private int collisionTimer;
+    private float collisionTimer;
     private bool isWalking;
-    private int walkingTimer;
+    private float walkingTimer;
 
     public float SKELETON_MUSIC_BUBBLE_RADIUS = 4.5f;
 
@@ -32,15 +32,15 @@ public class SoundManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (colliding)
-            collisionTimer++;
-        if (collisionTimer >= 20)
+            collisionTimer += Time.deltaTime;
+        if (collisionTimer >= 0.5)
         {
             colliding = false;
             collisionTimer = 0;
         }
         if (isWalking)
-            walkingTimer++;
-        if (walkingTimer >= 20)
+            walkingTimer += Time.deltaTime;
+        if (walkingTimer >= 0.5)
         {
             isWalking = false;
             walkingTimer = 0;
